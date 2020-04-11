@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Projects</h2>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Link</th>
+            <th>Budget</th>
+            <th>Customer`s name</th>
+            <th>Customer`s login</th>
+        </tr>
+        <?php foreach($projects as $project) {
+            echo ' <tr>
+            <td>' .$project->name. '</td>
+            <td><a href="' .$project->self->web. '">' .$project->self->web. '</a></td>
+            <td>' .$project->budget->amount. ' ' .$project->budget->currency. '</td>
+            <td>' .$project->employer->first_name. ' '.$project->employer->last_name. '</td>
+            <td>' .$project->employer->login. '</td>
+            </tr>';
+         }?>
+    </table>
+
+<!--    pagination start -->
+
+    <ul class="pagination">
+        <li><a href="?page=1">First</a></li>
+        <li class="<?php if($page <= 1){ echo 'disabled'; } ?>">
+            <a href="<?php if($page <= 1){ echo '#'; } else { echo "?page=".($page - 1); } ?>">Prev</a>
+        </li>
+        <li class="<?php if($page >= $total_pages){ echo 'disabled'; } ?>">
+            <a href="<?php if($page >= $total_pages){ echo '#'; } else { echo "?page=".($page + 1); } ?>">Next</a>
+        </li>
+        <li><a href="?page=<?php echo $total_pages; ?>">Last</a></li>
+    </ul>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+</div>
+
+<!--    pagination end -->
+
+<?php
+
+$dataPoints = array(
+    array("label"=>"<500 UAH", "y"=> count($firstPart)*10),
+    array("label"=>"500-1000 UAH", "y"=> count($secondPart)*10) ,
+    array("label"=>"1000-5000 UAN", "y"=> count($thirdPart)*10),
+    array("label"=>">5000 UAN", "y"=> count($fourthPart)*10),
+);
+?>
+
+<script>
+    window.onload = function() {
+
+        var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            title: {
+                text: "Budget of projects"
+            },
+            data: [{
+                type: "pie",
+                yValueFormatString: "#,##0.00\"%\"",
+                indexLabel: "{label} ({y})",
+                dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
+    }]
+    });
+        chart.render();
+    }
+</script>
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+</html>
+
